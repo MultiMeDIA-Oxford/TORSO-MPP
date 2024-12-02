@@ -1,0 +1,47 @@
+function M = fixMeshProblems( M , mel )
+
+  if nargin < 2, mel = 0; end
+  
+  M = MakeMesh( M );
+
+  triMINel = min( [ fro( M.xyz( M.tri(:,1) ,:) - M.xyz( M.tri(:,2) ,:) , 2 ) , fro( M.xyz( M.tri(:,2) ,:) - M.xyz( M.tri(:,3) ,:) , 2 ) , fro( M.xyz( M.tri(:,3) ,:) - M.xyz( M.tri(:,1) ,:) , 2 ) ] , [] , 2 );
+  M.tri( triMINel <= mel , : ) = [];
+  
+  M = TidyMesh( M , -1 );
+  M = vtkCleanPolyData( M , 'SetAbsoluteTolerance' , 1e-6 , 'SetToleranceIsAbsolute' , true , 'SetPointMerging' , true , 'SetConvertLinesToPoints' , false ,'SetConvertPolysToLines', false , 'SetConvertStripsToPolys' , false );
+  M.tri( ~M.tri(:,3) , : ) = [];
+  M = FixFacesOrientation( M );
+  
+  while 1  
+    M = vtkPolyDataConnectivityFilter( M , 'SetExtractionModeToLargestRegion' , [] );
+    
+    F = vtkFeatureEdges( M ,'SetBoundaryEdges',true,'SetFeatureEdges',false,'SetNonManifoldEdges',true,'SetManifoldEdges',false);
+    if isempty( F ) || isempty( fieldnames(F) ), break; end
+    M = vtkFillHolesFilter( M ,'SetHoleSize', 1e10 );
+%     if isfield( Mwh , 'tri' )
+%       M = Mwh;
+%     end
+
+    M = TidyMesh( M , -1 );
+    M = vtkCleanPolyData( M , 'SetAbsoluteTolerance' , mel / 10 , 'SetToleranceIsAbsolute' , true , 'SetPointMerging' , true );
+    M = FixFacesOrientation( M );
+    
+    F = vtkFeatureEdges( M ,'SetBoundaryEdges',true,'SetFeatureEdges',false,'SetNonManifoldEdges',true,'SetManifoldEdges',false);
+    if isempty( F ) || isempty( fieldnames(F) ), break; end
+    
+    for f = 1:size(F.tri,1)
+      pm = mean( F.xyz( [ F.tri(f,1) ; F.tri(f,2) ] , : ) , 1 );
+      while 1
+        [fid,~,d] = vtkClosestElement( M , pm );
+        if d < 1e-5
+          M.tri(fid,:) = [];
+        else, break;
+        end
+      end
+    end
+  end
+  
+  
+
+
+end

@@ -1,0 +1,8 @@
+
+COMMANDS in GIT-BASH:
+====================
+1. cd "F:\Oxford_research_projects\Student-supervision\Hannah-Smith\Torso-MPP"
+2. virtualenv -p python3 torso-2D-seg
+3. source ./torso-2D-seg/Scripts/activate
+4. pip3 install requests
+5. pip3 install torch===1.5.1 torchvision===0.6.1 -f https://download.pytorch.org/whl/torch_stable.html
