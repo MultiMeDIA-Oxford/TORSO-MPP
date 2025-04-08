@@ -55,9 +55,9 @@ for ff = 1:numel( SUBJECT_DIRs )
   
 end
 
-for ff = 1:numel( SUBJECT_DIRs )
-  if ~mppSubject( SUBJECT_DIRs{ff} ), continue; end
-  mpp_Torso_Recontouring
-  force mpp_Manual_Contour_Torso_Biobank              %output: BC.mat
-
-end
+% for ff = 1:numel( SUBJECT_DIRs )
+%  if ~mppSubject( SUBJECT_DIRs{ff} ), continue; end
+%  mpp_Torso_Recontouring
+%  force mpp_Manual_Contour_Torso_Biobank              %output: BC.mat
+%
+%end
